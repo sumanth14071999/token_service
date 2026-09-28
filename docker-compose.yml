@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: tokens
+      POSTGRES_USER: tokens
+      POSTGRES_PASSWORD: tokens
+    ports:
+      - "5433:5432"   # 5433 on the host, in case a local Postgres already uses 5432
+
+  kafka:
+    image: apache/kafka:3.8.0
+    ports:
+      - "9092:9092"

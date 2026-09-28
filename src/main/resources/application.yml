@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: token-authorization-service
+  datasource:
+    url: jdbc:postgresql://localhost:5433/tokens
+    username: tokens
+    password: tokens
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: token-authorization-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+app:
+  topics:
+    token-events: tokens.events
+  token-cache:
+    # Added after authorizations were slow at peak (see README "Production").
+    ttl: 10m
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
