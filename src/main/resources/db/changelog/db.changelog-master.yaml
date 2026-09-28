@@ -3,3 +3,5 @@ databaseChangeLog:
       file: db/changelog/changes/001-create-token.sql
   - include:
       file: db/changelog/changes/002-seed-tokens.sql
+  - include:
+      file: db/changelog/changes/003-create-authorization-log.sql

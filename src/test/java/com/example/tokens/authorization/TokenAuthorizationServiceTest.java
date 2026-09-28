@@ -8,6 +8,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import com.example.tokens.audit.AuthorizationAuditLogger;
+import com.example.tokens.audit.AuthorizationLogRepository;
 import com.example.tokens.support.MutableClock;
 import com.example.tokens.token.Token;
 import com.example.tokens.token.TokenCache;
@@ -26,6 +28,9 @@ class TokenAuthorizationServiceTest {
 
     @Mock
     private TokenRepository tokens;
+
+    @Mock
+    private AuthorizationLogRepository auditLogRepository;
 
     @Test
     void activeTokenIsAllowed() {
@@ -88,6 +93,7 @@ class TokenAuthorizationServiceTest {
 
     private TokenAuthorizationService serviceAt(String instant) {
         MutableClock clock = new MutableClock(Instant.parse(instant));
-        return new TokenAuthorizationService(tokens, new TokenCache(clock, Duration.ofMinutes(10)), clock);
+        return new TokenAuthorizationService(tokens, new TokenCache(clock, Duration.ofMinutes(10)), clock,
+                new AuthorizationAuditLogger(auditLogRepository, clock));
     }
 }
