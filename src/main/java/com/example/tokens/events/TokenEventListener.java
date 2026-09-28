@@ -17,7 +17,14 @@ public class TokenEventListener {
         this.handler = handler;
     }
 
-    @KafkaListener(topics = "${app.topics.token-events}")
+    /**
+     * Unique group id per JVM instance: each of the 3 replicas must see every event so it can evict its
+     * own local {@link com.example.tokens.token.TokenCache} entry. A shared group id would let Kafka hand
+     * a given event to only one replica, leaving the others serving a stale cached token until TTL expiry
+     * (see README "Blocking (security requirement)" and the Task 2 incident).
+     */
+    @KafkaListener(topics = "${app.topics.token-events}",
+            groupId = "token-authorization-service-cache-#{T(java.util.UUID).randomUUID().toString()}")
     public void onMessage(ConsumerRecord<String, String> record) throws JsonProcessingException {
         handler.handle(objectMapper.readValue(record.value(), TokenEvent.class));
     }

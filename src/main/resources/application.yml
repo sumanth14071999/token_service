@@ -14,7 +14,15 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
+      # group-id is overridden per-listener (see TokenEventListener) to a unique value per instance, so
+      # every replica gets every event instead of Kafka load-balancing them across replicas.
       group-id: token-authorization-service
+      # A unique group id never has a prior committed offset, so this always applies on every restart.
+      # Must stay "earliest": with "latest", a block/unblock event produced in the narrow window between
+      # this instance starting and its consumer finishing its initial group join could be silently
+      # skipped forever (not delayed - missed), leaving that replica serving a stale cached token past
+      # the 30s SLA. Replaying retained history once per restart is a safe, bounded cost given every
+      # event handler action is idempotent.
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
