@@ -2,7 +2,7 @@ package com.example.tokens.token;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,8 +41,10 @@ public class Token {
         this.validUntil = validUntil;
     }
 
+    private static final ZoneId CARD_ZONE = ZoneId.of("Europe/Berlin");
+
     public boolean isExpiredAt(Instant now) {
-        return validUntil != null && now.isAfter(validUntil.atStartOfDay(ZoneOffset.UTC).toInstant());
+        return validUntil != null && !now.isBefore(validUntil.plusDays(1).atStartOfDay(CARD_ZONE).toInstant());
     }
 
     public boolean isBlocked() {

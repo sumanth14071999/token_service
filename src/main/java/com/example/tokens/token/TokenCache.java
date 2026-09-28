@@ -32,10 +32,10 @@ public class TokenCache {
             return Optional.empty();
         }
         if (Instant.now(clock).isBefore(entry.expiresAt())) {
-            entries.remove(uid);
-            return Optional.empty();
+            return Optional.of(entry.token());
         }
-        return Optional.of(entry.token());
+        entries.remove(uid);
+        return Optional.empty();
     }
 
     public void put(Token token) {
